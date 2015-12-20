@@ -1,19 +1,23 @@
 import logging
 import sys
+from logging import StreamHandler, Formatter
+from logging.handlers import RotatingFileHandler
 from os import path
 
 
 def init_logging():
 	"""
 	Setup logging system to display user-friendly output of execution of the script
-	It may help easy find issues which can happens by executing script
+	It may help easy find issues which can happens by executing script.
+	By default 2 logger are active - console (for debugging purpose only) and to file
+	(for production execution to see potential issues)
 	"""
-	formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+	formatter = Formatter("%(asctime)s - %(levelname)s - %(message)s")
 
-	console = logging.StreamHandler(sys.stdout)
+	console = StreamHandler(sys.stdout)
 	console.setFormatter(formatter)
 
-	file = logging.FileHandler(path.join(path.dirname(__file__), "all_logs.log"))
+	file = RotatingFileHandler(path.join(path.dirname(__file__), "all_logs.log"), maxBytes=5242880, backupCount=5)
 	file.setFormatter(formatter)
 
 	logger = logging.getLogger()

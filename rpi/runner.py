@@ -6,7 +6,7 @@ from requests import codes, RequestException
 
 from detector import NoiseDetector
 from logger import init_logging
-from parsers import AppArgumentsParser
+from parsers import AppConfigParser
 
 init_logging()
 logger = logging.getLogger()
@@ -14,7 +14,7 @@ logger = logging.getLogger()
 if __name__ == "__main__":
 	logger.info("Application runs...")
 
-	config = AppArgumentsParser()
+	config = AppConfigParser()
 	config.parse()
 	logger.info(config.storage_url)
 

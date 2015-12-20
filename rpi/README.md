@@ -3,7 +3,7 @@
 Device contains combination of RPi and sensor module LM393. By default PIN 7 is connected as data transfer channel between
 RPi and sensor. 
 
-You can change all settings in *config.ini* file under section *Settings* -> *active_pin*
+You can change all settings in *config.ini* file under section *GPIO* -> *active_pin*
 
 # Useful links
 
