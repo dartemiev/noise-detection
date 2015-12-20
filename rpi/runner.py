@@ -1,5 +1,4 @@
 import logging
-import sys
 import time
 
 import requests
@@ -16,10 +15,10 @@ if __name__ == "__main__":
 	logger.info("Application runs...")
 
 	config = AppArgumentsParser()
-	config.parse(sys.argv[1:])
+	config.parse()
 	logger.info(config.storage_url)
 
-	detector = NoiseDetector()
+	detector = NoiseDetector(config.active_pin)
 	while True:
 		try:
 			response = requests.post(config.storage_url + "/noise/register", data={"level": detector.detect()})

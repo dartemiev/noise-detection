@@ -3,3 +3,8 @@
 
 # logging
 *.log
+
+# temporary files
+*.py[cod]
+*.swp
+*.tmp

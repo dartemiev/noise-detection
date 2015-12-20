@@ -1,7 +1,13 @@
+from configparser import ConfigParser
+
+from os import path
+
+
 class ArgumentsParser(object):
 	"""
 	Base class for all application arguments parsing
 	"""
+
 	def __init__(self, delimiter: str):
 		self.__delimiter = delimiter
 		self.__arguments = {}
@@ -35,17 +41,29 @@ class ArgumentsParser(object):
 		return self.__arguments[name]
 
 
-class AppArgumentsParser(ArgumentsParser):
+class AppArgumentsParser(object):
 	def __init__(self):
-		super().__init__("=")
+		super().__init__()
+		self.__storage_url = None
+		self.__active_pin = -1
+		self.__config = ConfigParser()
 
-	def parse(self, arguments: list):
-		super().parse(arguments)
+	def parse(self):
+		self.__config.read(path.join(path.dirname(__file__), "config.ini"))
+
+		self.__storage_url = self.__config.get("Settings", "storage_url")
+		self.__active_pin = self.__config.get("Settings", "active_pin")
+
 		self.__validate()
 
 	@property
 	def storage_url(self) -> str:
-		return self.get_argument("--url")
+		return self.__storage_url
+
+	@property
+	def active_pin(self) -> int:
+		return self.__active_pin
 
 	def __validate(self):
 		assert self.storage_url is not None and len(self.storage_url) is not 0
+		assert self.active_pin is not None and self.active_pin is not -1
