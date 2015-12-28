@@ -1,8 +1,7 @@
 import logging
 import time
 
-import requests
-from requests import codes, RequestException
+from requests import RequestException
 
 from detectors import get_detector, Detectors
 from logger import init_logging
@@ -17,13 +16,14 @@ if __name__ == "__main__":
 	config = AppConfigParser()
 	config.parse()
 
-	# detector = get_detector(Detector.SENSOR, config)
+	# detector = get_detector(Detectors.SENSOR, config)
 	detector = get_detector(Detectors.RANDOM, config)
 	while True:
 		try:
-			response = requests.post(config.storage_url + "/noise/register", data={"level": detector.detect()})
-			if response.status_code != codes.ok:
-				logger.info(response.text)
+			print(detector.detect())
+			# response = requests.post(config.storage_url + "/noise/register", data={"level": detector.detect()})
+			# if response.status_code != codes.ok:
+			# 	logger.info(response.text)
 
 			# response = requests.get(config.storage_url + "/noise/all")
 			# items = json.loads(response.text)

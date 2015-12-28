@@ -1,6 +1,6 @@
 import logging
 import random
-from enum import Enum
+import time
 
 from RPi import GPIO
 
@@ -9,7 +9,8 @@ from parsers import AppConfigParser
 logger = logging.getLogger()
 
 
-class Detectors(Enum):
+@enumerate
+class Detectors(object):
 	SENSOR = 1
 	RANDOM = 2
 
@@ -18,6 +19,7 @@ class NoiseDetector(object):
 	"""
 	Base class for every noise detection implementation.
 	"""
+
 	def __init__(self, config: AppConfigParser):
 		"""
 		:param config: Configuration file (e.g. config.ini) where are all application
@@ -45,10 +47,24 @@ class SensorDetector(NoiseDetector):
 
 		logger.info("RPi listens pin {0} from sensor".format(self.__pin))
 		GPIO.setmode(GPIO.BCM)
-		GPIO.setup(self.__pin, GPIO.IN)
+		# GPIO.setup(self.__pin, GPIO.IN)
 
 	def detect(self) -> float:
-		return GPIO.input(self.__pin)
+		# return GPIO.input(self.__pin)
+		return self.__read_analog(self.__pin)
+
+	# Define function to measure charge time
+	def __read_analog(self, pin: int) -> int:
+		counter = 0
+		# Discharge capacitor
+		GPIO.setup(pin, GPIO.OUT)
+		GPIO.output(pin, GPIO.LOW)
+		time.sleep(0.1)
+		GPIO.setup(pin, GPIO.IN)
+		# Count loops until voltage across capacitor reads high on GPIO
+		while GPIO.input(pin) == GPIO.LOW:
+			counter += 1
+		return counter
 
 
 class RandomDetector(NoiseDetector):
