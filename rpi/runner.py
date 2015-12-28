@@ -4,7 +4,7 @@ import time
 import requests
 from requests import codes, RequestException
 
-from detector import NoiseDetector
+from detectors import get_detector, Detectors
 from logger import init_logging
 from parsers import AppConfigParser
 
@@ -16,9 +16,9 @@ if __name__ == "__main__":
 
 	config = AppConfigParser()
 	config.parse()
-	logger.info(config.storage_url)
 
-	detector = NoiseDetector(config.active_pin)
+	# detector = get_detector(Detector.SENSOR, config)
+	detector = get_detector(Detectors.RANDOM, config)
 	while True:
 		try:
 			response = requests.post(config.storage_url + "/noise/register", data={"level": detector.detect()})

@@ -60,6 +60,9 @@ class AppConfigParser(object):
 		return self.__active_pin
 
 	def __validate(self):
+		"""
+		Validates all properties of configuration file.
+		"""
 		assert self.storage_interval is not None and self.storage_interval is not 0
 		assert self.storage_url is not None and len(self.storage_url) is not 0
 		assert self.active_pin is not None and self.active_pin is not -1
