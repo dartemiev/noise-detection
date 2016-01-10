@@ -1,15 +1,14 @@
 import logging
 import random
-import time
 
 from RPi import GPIO
 
+from controllers.MCP3008 import MCP3008
 from parsers import AppConfigParser
 
 logger = logging.getLogger()
 
 
-@enumerate
 class Detectors(object):
 	SENSOR = 1
 	RANDOM = 2
@@ -27,7 +26,7 @@ class NoiseDetector(object):
 		"""
 		assert config is not None
 
-	def detect(self) -> float:
+	def detect(self) -> int:
 		"""
 		Detects and returns level of noise
 		:return: Current value of detected noise
@@ -47,24 +46,10 @@ class SensorDetector(NoiseDetector):
 
 		logger.info("RPi listens pin {0} from sensor".format(self.__pin))
 		GPIO.setmode(GPIO.BCM)
-		# GPIO.setup(self.__pin, GPIO.IN)
+		self.__adc = MCP3008(pin_clk=7, pin_cs=24, pin_miso=8, pin_mosi=25)
 
-	def detect(self) -> float:
-		# return GPIO.input(self.__pin)
-		return self.__read_analog(self.__pin)
-
-	# Define function to measure charge time
-	def __read_analog(self, pin: int) -> int:
-		counter = 0
-		# Discharge capacitor
-		GPIO.setup(pin, GPIO.OUT)
-		GPIO.output(pin, GPIO.LOW)
-		time.sleep(0.1)
-		GPIO.setup(pin, GPIO.IN)
-		# Count loops until voltage across capacitor reads high on GPIO
-		while GPIO.input(pin) == GPIO.LOW:
-			counter += 1
-		return counter
+	def detect(self) -> int:
+		return self.__adc.read(0)
 
 
 class RandomDetector(NoiseDetector):
@@ -73,8 +58,13 @@ class RandomDetector(NoiseDetector):
 	"""
 	__doc__ = NoiseDetector.__doc__
 
-	def detect(self) -> float:
-		return random.random()
+	def detect(self) -> int:
+		result = 0
+		for _ in range(10):
+			result <<= 1
+			if random.random() <= 0.5:
+				result |= 0x1
+		return result
 
 
 def get_detector(detector: Detectors, config: AppConfigParser) -> NoiseDetector:

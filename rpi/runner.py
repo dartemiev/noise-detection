@@ -33,4 +33,4 @@ if __name__ == "__main__":
 			logger.fatal("Server {0} is down!".format(config.storage_url))
 			logger.fatal(error)
 
-		time.sleep(5)
+		time.sleep(1)
