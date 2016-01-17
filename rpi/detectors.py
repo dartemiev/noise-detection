@@ -3,8 +3,8 @@ import random
 
 from RPi import GPIO
 
+from config.parser import AppConfigParser
 from controllers.MCP3008 import MCP3008
-from parsers import AppConfigParser
 
 logger = logging.getLogger()
 
@@ -42,14 +42,17 @@ class SensorDetector(NoiseDetector):
 
 	def __init__(self, config: AppConfigParser):
 		super().__init__(config)
-		self.__pin = config.active_pin
+		self.__config = config
 
-		logger.info("RPi listens pin {0} from sensor".format(self.__pin))
 		GPIO.setmode(GPIO.BCM)
-		self.__adc = MCP3008(pin_clk=7, pin_cs=24, pin_miso=8, pin_mosi=25)
+		self.__adc = MCP3008(pin_clk=config.adc.pins.clk, pin_cs=config.adc.pins.cs, pin_miso=config.adc.pins.miso,
+							 pin_mosi=config.adc.pins.mosi)
+
+	def __del__(self):
+		GPIO.cleanup()
 
 	def detect(self) -> int:
-		return self.__adc.read(0)
+		return self.__adc.read(channel=self.__config.adc.channel)
 
 
 class RandomDetector(NoiseDetector):

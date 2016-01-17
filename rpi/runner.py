@@ -1,11 +1,12 @@
 import logging
 import time
+from os import path
 
 from requests import RequestException
 
+from config.parser import AppConfigParser
 from detectors import get_detector, Detectors
-from logger import init_logging
-from parsers import AppConfigParser
+from util.logger import init_logging
 
 init_logging()
 logger = logging.getLogger()
@@ -14,13 +15,12 @@ if __name__ == "__main__":
 	logger.info("Application runs...")
 
 	config = AppConfigParser()
-	config.parse()
+	config.parse(path.join(path.dirname(__file__), "config.ini"))
 
-	# detector = get_detector(Detectors.SENSOR, config)
-	detector = get_detector(Detectors.RANDOM, config)
+	detector = get_detector(Detectors.SENSOR, config)
 	while True:
 		try:
-			print(detector.detect())
+			print("DETECTED DATA = {}".format(detector.detect()))
 			# response = requests.post(config.storage_url + "/noise/register", data={"level": detector.detect()})
 			# if response.status_code != codes.ok:
 			# 	logger.info(response.text)
@@ -30,7 +30,7 @@ if __name__ == "__main__":
 			# for item in items:
 			# 	logger.warn(item)
 		except RequestException as error:
-			logger.fatal("Server {0} is down!".format(config.storage_url))
+			logger.fatal("Server {} is down!".format(config.storage_url))
 			logger.fatal(error)
 
-		time.sleep(1)
+		time.sleep(0.5)
